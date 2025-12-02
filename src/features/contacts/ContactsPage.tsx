@@ -1,0 +1,81 @@
+import React from 'react';
+import { useContactsController } from './hooks/useContactsController';
+import { ContactsHeader } from './components/ContactsHeader';
+import { ContactsFilters } from './components/ContactsFilters';
+import { ContactsTabs } from './components/ContactsTabs';
+import { ContactsStageTabs } from './components/ContactsStageTabs';
+import { ContactsList } from './components/ContactsList';
+import { ContactFormModal } from './components/ContactFormModal';
+import ConfirmModal from '@/components/ConfirmModal';
+
+export const ContactsPage: React.FC = () => {
+    const controller = useContactsController();
+
+    return (
+        <div className="space-y-6 p-8 max-w-[1600px] mx-auto">
+            <ContactsHeader
+                viewMode={controller.viewMode}
+                search={controller.search}
+                setSearch={controller.setSearch}
+                statusFilter={controller.statusFilter}
+                setStatusFilter={controller.setStatusFilter}
+                isFilterOpen={controller.isFilterOpen}
+                setIsFilterOpen={controller.setIsFilterOpen}
+                openCreateModal={controller.openCreateModal}
+            />
+
+            {controller.isFilterOpen && (
+                <ContactsFilters
+                    dateRange={controller.dateRange}
+                    setDateRange={controller.setDateRange}
+                />
+            )}
+
+            {/* Stage Tabs - Funil de Contatos */}
+            <ContactsStageTabs
+                activeStage={controller.stageFilter}
+                onStageChange={controller.setStageFilter}
+                counts={controller.stageCounts}
+            />
+
+            <ContactsTabs
+                viewMode={controller.viewMode}
+                setViewMode={controller.setViewMode}
+                contactsCount={controller.filteredContacts.length}
+                companiesCount={controller.companies.length}
+            />
+
+            <ContactsList
+                viewMode={controller.viewMode}
+                filteredContacts={controller.filteredContacts}
+                filteredCompanies={controller.filteredCompanies}
+                contacts={controller.contacts}
+                getCompanyName={controller.getCompanyName}
+                updateContact={controller.updateContact}
+                convertContactToDeal={controller.convertContactToDeal}
+                openEditModal={controller.openEditModal}
+                setDeleteId={controller.setDeleteId}
+                addToast={controller.addToast}
+            />
+
+            <ContactFormModal
+                isOpen={controller.isModalOpen}
+                onClose={() => controller.setIsModalOpen(false)}
+                onSubmit={controller.handleSubmit}
+                formData={controller.formData}
+                setFormData={controller.setFormData}
+                editingContact={controller.editingContact}
+            />
+
+            <ConfirmModal
+                isOpen={!!controller.deleteId}
+                onClose={() => controller.setDeleteId(null)}
+                onConfirm={controller.confirmDelete}
+                title="Excluir Contato"
+                message="Tem certeza que deseja excluir este contato? Esta ação não pode ser desfeita."
+                confirmText="Excluir"
+                variant="danger"
+            />
+        </div>
+    );
+};
